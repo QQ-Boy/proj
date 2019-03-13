@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.crm.mapper.CustomerMapper" >
+  <resultMap id="BaseResultMap" type="Customer" >
+    <id column="cust_id" property="custId" jdbcType="BIGINT" />
+    <result column="cust_name" property="custName" jdbcType="VARCHAR" />
+    <result column="cust_user_id" property="custUserId" jdbcType="BIGINT" />
+    <result column="cust_create_id" property="custCreateId" jdbcType="BIGINT" />
+    <result column="cust_source" property="custSource" jdbcType="VARCHAR" />
+    <result column="cust_industry" property="custIndustry" jdbcType="VARCHAR" />
+    <result column="cust_level" property="custLevel" jdbcType="VARCHAR" />
+    <result column="cust_linkman" property="custLinkman" jdbcType="VARCHAR" />
+    <result column="cust_phone" property="custPhone" jdbcType="VARCHAR" />
+    <result column="cust_mobile" property="custMobile" jdbcType="VARCHAR" />
+    <result column="cust_zipcode" property="custZipcode" jdbcType="VARCHAR" />
+    <result column="cust_address" property="custAddress" jdbcType="VARCHAR" />
+    <result column="cust_createtime" property="custCreatetime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <select id="getCustomerList" parameterType="com.ssm.crm.daomain.QueryVo" resultMap="BaseResultMap">
+        SELECT
+          c.cust_id,
+          c.cust_name,
+          c.cust_user_id,
+          a.dict_item_name cust_source,
+          b.dict_item_name cust_industry,
+          d.dict_item_name cust_level,
+          c.cust_create_id,
+          c.cust_linkman,
+          c.cust_phone,
+          c.cust_mobile,
+          c.cust_zipcode,
+          c.cust_address,
+          c.cust_createtime
+        FROM
+          customer c
+          LEFT JOIN base_dict a ON c.cust_source = a.dict_id
+          LEFT JOIN base_dict b ON c.cust_industry = b.dict_id
+          LEFT JOIN base_dict d ON c.cust_level = d.dict_id
+          <include refid="getCustomer_list_sql"/>
+          LIMIT #{start}, #{size}
+  </select>
+
+  <sql id="getCustomer_list_sql">
+    <where>
+      <if test="custName != null and custName != ''">
+        <!-- cust_name LIKE '%${custName}%' -->
+        cust_name LIKE "%"#{custName}"%"
+      </if>
+      <if test="custSource != null and custSource != ''">
+        AND cust_source = #{custSource}
+      </if>
+      <if test="custIndustry != null and custIndustry != ''">
+        AND cust_industry = #{custIndustry}
+      </if>
+      <if test="custLevel != null and custLevel != ''">
+        AND cust_level = #{custLevel}
+      </if>
+    </where>
+  </sql>
+
+  <select id="getTotal" resultType="integer">
+    SELECT
+        count(*)
+        FROM
+          customer c
+          LEFT JOIN base_dict a ON c.cust_source = a.dict_id
+          LEFT JOIN base_dict b ON c.cust_industry = b.dict_id
+          LEFT JOIN base_dict d ON c.cust_level = d.dict_id
+  </select>
+
+
+</mapper>
